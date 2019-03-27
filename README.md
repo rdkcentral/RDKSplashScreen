@@ -3,8 +3,10 @@
 1. `git clone git@github.com:mlapps/blueprint.git com.metrological.app.Vimeo`
 2. `cd com.metrological.app.Vimeo`
 3. `git remote set-url origin git@github.com:mlapps/com.metrological.app.Vimeo.git`
-4. Create a new empty git repo on the specified origin url.
-5. `git push origin master`
+4. Create a new empty git repo on the specified origin url (https://github.com/organizations/mlapps/repositories/new):
+5. Set name and identifier in `metadata.json`.
+6. `git commit -anm "init app"`
+7. `git push origin master`
 
 Now you're set up and ready to start building your app!
 
