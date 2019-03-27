@@ -1,14 +1,14 @@
-# Lightning apps
+# Installation
 
-Metrological in-house developed apps catalogue using the [Lightning SDK](https://github.com/WebPlatformForEmbedded/Lightning-SDK).
+1. `git clone git@github.com:mlapps/blueprint.git com.metrological.app.Vimeo`
+2. `cd com.metrological.app.Vimeo`
+3. `git remote set-url origin git@github.com:mlapps/com.metrological.app.Vimeo.git`
+4. Create a new empty git repo on the specified origin url.
+5. `git push origin master`
 
-## Instructions
-Create your app using at least the following files:
-* src/App.js contains your app class
-* metadata.json contains app info
-* all static files used in your app must be placed in the static folder
+Now you're set up and ready to start building your app!
 
-## Building app distribution
+# Building app distribution
 
 Use the following steps to create a distribution:
 
