@@ -7,8 +7,11 @@
 5. Set name and identifier in `metadata.json`.
 6. `git commit -anm "init app"`
 7. `git push origin master`
+8. `npm install`
 
-Now you're set up and ready to start building your app!
+Now please check if you can run index.html (using a web server or your IDE).
+
+If it works you're set up and ready to start building your app!
 
 # Building app distribution
 
