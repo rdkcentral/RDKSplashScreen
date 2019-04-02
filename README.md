@@ -11,6 +11,12 @@
 
 Now please check if you can run index.html (using a web server or your IDE).
 
+If you don't have a web server installed you could run instant-server from the directory:
+```
+sudo npm install -g instant-server
+instant -p 8081 ./
+```
+
 If it works you're set up and ready to start building your app!
 
 # Building app distribution
