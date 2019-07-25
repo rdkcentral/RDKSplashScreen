@@ -3,6 +3,7 @@ import App from '../../src/App.js';
 export default class RDKLogo extends lng.Component{
 	static _template(){
 		return {
+			w: 1897, h: 372,
 			LetterR: { alpha: 0.0001, x: 500, y: 0, w: 436, h: 372, src: App.getPath('images/logo/Letter_R.png') },
 			LetterD: { alpha: 0.0001, x: 1000, y: 0, w: 431, h: 372, src: App.getPath('images/logo/Letter_D.png') },
 			LetterK: { alpha: 0.0001, x: 1500, y: 0, w: 397, h: 372, src: App.getPath('images/logo/Letter_K.png') },
