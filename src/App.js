@@ -1,6 +1,7 @@
 import RDKLogo from './animations/RDKLogo.js';
 import Icons from './animations/Icons.js';
 import Message from './components/Message.js';
+import WPE from "./core/WPE.js";
 
 export default class App extends ux.App{
 	static _template(){
@@ -19,6 +20,8 @@ export default class App extends ux.App{
 	}
 
 	_init(){
+		//this._wpe = new WPE('10.1.77.201', 80, this);
+		this._wpe = new WPE('127.0.0.1', 80, this);
 		this._globalAnimation = this.animation({
 			duration: 7, repeat: 0, stopMethod: 'immediate', actions: [
 				{ t: 'Wrapper', p: 'x', v: { 0.08: 840, 0.3: 0 } },
@@ -37,9 +40,6 @@ export default class App extends ux.App{
 		this.tag('RDKLogo').start();
 		this.tag('Icons').start();
 		this._globalAnimation.start();
-		this._globalAnimation.on('finish', ()=>{
-			this._setState('EstablishConnection');
-		});
 	}
 
 	stopAnimation(){
@@ -56,22 +56,26 @@ export default class App extends ux.App{
 		return this._ipAddress;
 	}
 
+	goToUrl(url) {
+		window.location.href = url;
+	}
+
 	static _states(){
 		return [
-			class EstablishConnection extends this{
-				$enter(){
-					this.tag('Message').message = 'Establishing Connection ...';
-
-					//Testing - get IP ADDRESS:
-					setTimeout(()=>{
-						this.ipAddress = '192.168.0.135';
-						this._setState('Connected');
-					}, 5000);
+			class HasLocalNetwork extends this{
+				$enter(state, {data}){
+					this.tag('Message').message = `Connected; IP: ${data}`;
 				}
 			},
-			class Connected extends this{
-				$enter(){
-					this.tag('Message').message = `Connected; IP: ${this.ipAddress}`;
+			class GoToURL extends this{
+				$enter(state, {data}){
+					if (this._globalAnimation.state === 4) {
+						this.goToUrl(data.url);
+					} else {
+						this._globalAnimation.on('finish', ()=>{
+							this.goToUrl(data.url);
+						});
+					}
 				}
 			},
 			class NoConnection extends this{
@@ -79,11 +83,6 @@ export default class App extends ux.App{
 					this.tag('Message').message = 'No valid internet connection';
 				}
 			},
-			class GoToUrl extends this{
-				$enter(){
-
-				}
-			}
 		];
 	};
 
