@@ -3,7 +3,6 @@ import Icons from './animations/Icons.js';
 import Message from './components/Message.js';
 
 export default class App extends ux.App{
-
 	static _template(){
 		return {
 			Background: { w: 1920, h: 1080, rect: true, colorTop: 0xFF183644, colorBottom: 0xFF3C646D },
@@ -19,14 +18,7 @@ export default class App extends ux.App{
 		};
 	}
 
-	static getFonts(){
-		return [];
-	}
-
 	_init(){
-		this.tag('RDKLogo').start();
-		this.tag('Icons').start();
-
 		this._globalAnimation = this.animation({
 			duration: 7, repeat: 0, stopMethod: 'immediate', actions: [
 				{ t: 'Wrapper', p: 'x', v: { 0.08: 840, 0.3: 0 } },
@@ -38,10 +30,22 @@ export default class App extends ux.App{
 				{ t: 'Clouds', p: 'x', v: { 0.25: 525, 1: 395 } }
 			]
 		});
+		this.startAnimation();
+	}
+
+	startAnimation(){
+		this.tag('RDKLogo').start();
+		this.tag('Icons').start();
 		this._globalAnimation.start();
 		this._globalAnimation.on('finish', ()=>{
 			this._setState('EstablishConnection');
 		});
+	}
+
+	stopAnimation(){
+		this.tag('RDKLogo').stop();
+		this.tag('Icons').stop();
+		this._globalAnimation.stop();
 	}
 
 	set ipAddress(v){
@@ -58,7 +62,7 @@ export default class App extends ux.App{
 				$enter(){
 					this.tag('Message').message = 'Establishing Connection ...';
 
-					//Testing:
+					//Testing - get IP ADDRESS:
 					setTimeout(()=>{
 						this.ipAddress = '192.168.0.135';
 						this._setState('Connected');
@@ -67,12 +71,17 @@ export default class App extends ux.App{
 			},
 			class Connected extends this{
 				$enter(){
-					this.tag('Message').message = `Connected, IP: ${this.ipAddress}`;
+					this.tag('Message').message = `Connected; IP: ${this.ipAddress}`;
 				}
 			},
 			class NoConnection extends this{
 				$enter(){
 					this.tag('Message').message = 'No valid internet connection';
+				}
+			},
+			class GoToUrl extends this{
+				$enter(){
+
 				}
 			}
 		];
