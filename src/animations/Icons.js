@@ -14,7 +14,7 @@ export default class Icons extends lng.Component{
 
 	_init(){
 		this._iconAnimation = this.animation({
-			duration: 4.2, delay: 0.78, repeat: 0, stopMethod: 'immediate', actions: [
+			duration: 4.2, delay: 2.78, repeat: 0, stopMethod: 'immediate', actions: [
 				{ t: 'Icon01', p: 'scale', v: { 0.2: 0, 0.35: 1 } },
 				{ t: 'Icon01', p: 'rotation', v: { 0.2: -0.5, 0.35: 0 } },
 				{ t: 'Icon02', p: 'scale', v: { 0.215: 0, 0.365: 1 } },

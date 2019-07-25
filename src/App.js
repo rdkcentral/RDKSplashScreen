@@ -11,7 +11,7 @@ export default class App extends ux.App{
 				x: 800, y: -1660, w: 1920, h: 1080, scale: 6.4,
 				Clouds: { x: 545, y: 165, w: 1064, h: 556, src: App.getPath('images/assets/clouds.png') },
 				Shade: { x: 990, y: 965, w: 876, h: 858, scale: 0.7, mountY: 1, mountX: 0.5, src: App.getPath('images/assets/shade.png') },
-				House: { x: 525, y: 445, w: 930, h: 555, src: App.getPath('images/assets/house1.png') },
+				House: { x: 525, y: 445, w: 930, h: 555, src: App.getPath('images/assets/house.png') },
 				Icons: { x: 540, y: 510, type: Icons },
 				RDKLogo: { x: 820, y: 800, type: RDKLogo, mount: 0.5, scale: 0.18 }
 			},
@@ -24,7 +24,7 @@ export default class App extends ux.App{
 		//this._wpe = new WPE('10.1.77.201', 80, this);
 		this._wpe = new WPE('127.0.0.1', 80, this);
 		this._globalAnimation = this.animation({
-			duration: 7, repeat: 0, stopMethod: 'immediate', actions: [
+			duration: 7, repeat: 0, delay: 2, stopMethod: 'immediate', actions: [
 				{ t: 'Wrapper', p: 'x', v: { 0.08: 840, 0.3: 0 } },
 				{ t: 'Wrapper', p: 'y', v: { 0.08: -1660, 0.3: 0 } },
 				{ t: 'Wrapper', p: 'scale', v: { 0.08: 6.4, 0.3: 1 } },

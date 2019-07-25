@@ -7,10 +7,10 @@ export default class RDKLogo extends lng.Component{
 			LetterR: { alpha: 0.0001, x: 500, y: 0, w: 436, h: 372, src: App.getPath('images/logo/Letter_R.png') },
 			LetterD: { alpha: 0.0001, x: 1000, y: 0, w: 431, h: 372, src: App.getPath('images/logo/Letter_D.png') },
 			LetterK: { alpha: 0.0001, x: 1500, y: 0, w: 397, h: 372, src: App.getPath('images/logo/Letter_K.png') },
-			BarBlue: { alpha: 0.0001, x: 0, y: 0, w: 449, h: 71, src: App.getPath('images/logo/01_Bar_Blue.png') },
-			BarYellow: { alpha: 0.0001, x: 0, y: 100, w: 449, h: 71, src: App.getPath('images/logo/02_Bar_Yellow.png') },
-			BarGreen: { alpha: 0.0001, x: 0, y: 200, w: 449, h: 71, src: App.getPath('images/logo/03_Bar_Green.png') },
-			BarOrange: { alpha: 0.0001, x: 0, y: 300, w: 449, h: 71, src: App.getPath('images/logo/04_Bar_Orange.png') }
+			BarBlue: { alpha: 0.0001, x: 0, y: 0, w: 449, h: 71, rect: true, color: 0xFF14B0DD },
+			BarYellow: { alpha: 0.0001, x: 0, y: 100, w: 449, h: 71, rect: true, color: 0xFFF9B82D },
+			BarGreen: { alpha: 0.0001, x: 0, y: 200, w: 449, h: 71, rect: true, color: 0xFF9AC235 },
+			BarOrange: { alpha: 0.0001, x: 0, y: 300, w: 449, h: 71, rect: true, color: 0xFFEF7D24 }
 		};
 	}
 
