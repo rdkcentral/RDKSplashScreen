@@ -15,7 +15,8 @@ export default class App extends ux.App{
 				Icons: { x: 540, y: 510, type: Icons },
 				RDKLogo: { x: 820, y: 800, type: RDKLogo, mount: 0.5, scale: 0.18 }
 			},
-			Message: { x: 80, y: 60, type: Message }
+			Message: { x: 80, y: 60, type: Message },
+			Overlay:{ w: 1920, h: 1080, rect: true, color: 0xFF000000 }
 		};
 	}
 
@@ -33,7 +34,10 @@ export default class App extends ux.App{
 				{ t: 'Clouds', p: 'x', v: { 0.25: 525, 1: 395 } }
 			]
 		});
-		this.startAnimation();
+		setTimeout(()=>{
+			this.tag('Overlay').visible = false;
+			this.startAnimation();
+		}, 2000);
 	}
 
 	startAnimation(){
