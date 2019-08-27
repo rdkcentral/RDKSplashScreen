@@ -22,8 +22,29 @@ export default class WPE {
         this._state = this.STATES.NOIP;
         this._thunderjs = new ThunderJS(config);
         this._thunderjs.on('Controller', 'statechange', this._onMessage.bind(this));
-        this._checkForIP();
 
+        this._uxPlugin = undefined;
+        this._wifiPlugin = undefined;
+
+        // check if we have a wifi or ux plugin
+        this._thunderjs.call('Controller', 'status').then( _plugins => {
+            for (let i=0; i < _plugins.length; i++) {
+                let _p = _plugins[i]
+
+                if (_p.callsign === 'UX') {
+                    console.log('Found UX plugin');
+                    this._uxPlugin = _p;
+                }
+
+                if (_p.callsign === 'WifiControl') {
+                    console.log('Found WifiControl plugin')
+                    this._wifiPlugin = _p;
+                }
+            }
+        });
+
+        // give the UI a little time to animate
+        setTimeout(this._checkForIP.bind(this), 5000);
         setTimeout(this._noConnectionAfterTime.bind(this), 20000);
     }
 
@@ -80,8 +101,13 @@ export default class WPE {
 
         if (this._state === this.STATES.HASINTERNET) {
                 this._getBootmanagerUrl()
-                .then(this._updateUIState.bind(this, 'GoToURL'))
-                .catch(err => {
+                .then( data => {
+                    if (this._uxPlugin === undefined)
+                        // we dont seem to have a ux plugin, redirect the current window instead
+                        this._updateUIState('GoToURL', data);
+                    else
+                        this._launchUx(data.url);
+                }).catch(err => {
                     console.error(err);
                 })
         }
@@ -94,6 +120,47 @@ export default class WPE {
     _getBootmanagerUrl(info) {
         const url = this._baseBootmanagerUrl;
         return this._xhr('GET', url);
+    }
+
+    _launchUx(url) {
+        //using all for now, individual states on UX through thunderjs didnt seem to work
+        this._thunderjs.on('Controller', 'all', (data) => {
+            if (data.callsign !== 'UX')
+                return;
+
+            let _data = data.data ? data.data : {};
+
+            if (_data.state === 'activated')
+                this._thunderjs.call('UX', 'state', 'resumed')
+
+            if (_data.suspended === false)
+                this._thunderjs.call('UX', 'url',  url)
+
+            if (_data.url === url && _data.loaded)
+                this._harakiri();
+
+        });
+
+        if (this._uxPlugin.state === 'deactivated')
+            this._thunderjs.call('Controller', 'activate', {'callsign': 'UX'})
+        else if (this._uxPlugin.state === 'suspended')
+            this._thunderjs.call('UX', 'state', 'resumed')
+        else if (this._uxPlugin.state === 'resumed')
+            this._thunderjs.call('UX', 'url')
+                .then( _url => {
+                    if (_url === url)
+                        this._harakiri();
+                    else
+                        this._thunderjs.call('UX', 'url', url)
+                });
+
+    }
+
+    _harakiri() {
+        // give UX some time to load
+        setTimeout( () => {
+            this._thunderjs.call('Controller', 'deactivate', {'callsign': 'WebKitBrowser'} )
+        }, 4000)
     }
 
     _getIPAddress() {
