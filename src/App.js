@@ -1,7 +1,9 @@
 import RDKLogo from './animations/RDKLogo.js';
 import Icons from './animations/Icons.js';
 import Message from './components/Message.js';
-import WPE from "./core/WPE.js";
+import WifiList from './components/WifiList.js';
+import WPE from './core/WPE.js';
+import WifiLogin from './components/WifiLogin.js';
 
 export default class App extends ux.App{
 	static _template(){
@@ -16,7 +18,9 @@ export default class App extends ux.App{
 				RDKLogo: { x: 820, y: 800, type: RDKLogo, mount: 0.5, scale: 0.18 }
 			},
 			Message: { x: 80, y: 60, type: Message },
-			Overlay:{ w: 1920, h: 1080, rect: true, color: 0xFF000000 }
+			WifiList: { x: 100, y: 100, type: WifiList, visible: false },
+			WifiLoginScreen: { x: 960, y: 540, mount: 0.5, type: WifiLogin },
+			Overlay: { w: 1920, h: 1080, rect: true, color: 0xFF000000 }
 		};
 	}
 
@@ -38,6 +42,13 @@ export default class App extends ux.App{
 			this.tag('Overlay').visible = false;
 			this.startAnimation();
 		}, 2000);
+
+		//TESTING - add wifi list and set state for wifi:
+		//this._setState('WifiLocations'); show this state when no connection is available
+		// name: wifiName (string), strength: wifi strength (int 0 to 100), protected: is wifi password protected or not (boolean true or false)
+		//TODO: uncomment the 2 lines below to test:
+		// this.tag('WifiList').items = [{ name: 'Wifi01', strength: 80, protected: true }, { name: 'Wifi02', strength: 20, protected: true }, { name: 'Wifi03', strength: 45, protected: false }, { name: 'Wifi04', strength: 70, protected: false }, { name: 'Wifi05', strength: 10, protected: true }, { name: 'Wifi06', strength: 56, protected: true }, { name: 'Wifi07', strength: 100, protected: true }, { name: 'Wifi08', strength: 74, protected: false }, { name: 'Wifi09', strength: 24, protected: true }, { name: 'Wifi10', strength: 10, protected: true }, { name: 'Wifi11', strength: 88, protected: false }, { name: 'Wifi12', strength: 63, protected: true }];
+		// this._setState('WifiLocations');
 	}
 
 	startAnimation(){
@@ -60,22 +71,33 @@ export default class App extends ux.App{
 		return this._ipAddress;
 	}
 
-	goToUrl(url) {
+	goToUrl(url){
 		window.location.href = url;
+	}
+
+	$onLogin({ name = '', password = ''}){
+		console.log('$onLogin :', name, password);
+		//Setup connection
+		//then..
+		// foo.connectMyWifi(name, password).then(()=>{
+		// 	state: connected - Go to desired state or page
+		// }).catch(()=>{
+		// 	state: connection failed - this._setState('WifiLocations');
+		// });
 	}
 
 	static _states(){
 		return [
 			class HasLocalNetwork extends this{
-				$enter(state, {data}){
+				$enter(state, { data }){
 					this.tag('Message').message = `Connected; IP: ${data}`;
 				}
 			},
 			class GoToURL extends this{
-				$enter(state, {data}){
-					if (this._globalAnimation.state === 4) {
+				$enter(state, { data }){
+					if(this._globalAnimation.state === 4){
 						this.goToUrl(data.url);
-					} else {
+					}else{
 						this._globalAnimation.on('finish', ()=>{
 							this.goToUrl(data.url);
 						});
@@ -85,9 +107,67 @@ export default class App extends ux.App{
 			class NoConnection extends this{
 				$enter(){
 					this.tag('Message').message = 'No valid internet connection';
+					this._setState('WifiLocations');
 				}
 			},
+			class WifiLocations extends this{
+				$enter(){
+					this.tag('WifiList').visible = true;
+					this._setState('WifiLocations.LoadLocations');
+				}
+
+				$exit(){
+					this.tag('WifiList').visible = false;
+				}
+
+				static _states(){
+					return [
+						class LoadLocations extends this{
+							$enter(){
+								//Testing
+								//Load location then....
+								this._setState('WifiLocations.Ready');
+							}
+						},
+						class Ready extends this{
+							$enter(){
+
+							}
+
+							$onWifiItemSelect({ item }){
+								console.log('$onWifiItemSelect :', item);
+								this.selectedWifiName = item.name;
+								this._setState('WifiLocations.WifiLoginScreen');
+							}
+
+							_getFocused(){
+								return this.tag('WifiList');
+							}
+						},
+						class WifiLoginScreen extends this{
+							$enter(){
+								// Show Keyboard
+								this.tag('WifiLoginScreen').wifiName = this.selectedWifiName;
+								this.tag('WifiLoginScreen').showLogin();
+							}
+
+							$exit(){
+								// Hide Keyboard
+								console.log('$exit :', );
+								this.tag('WifiLoginScreen').hideLogin();
+							}
+
+							_handleBack(){
+								this._setState('WifiLocations.Ready');
+							}
+
+							_getFocused(){
+								return this.tag('WifiLoginScreen');
+							}
+						}
+					];
+				}
+			}
 		];
 	};
-
 }
