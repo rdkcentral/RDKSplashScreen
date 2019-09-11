@@ -25,7 +25,7 @@ export default class App extends ux.App{
 	}
 
 	_init(){
-		//this._wpe = new WPE('10.1.77.201', 80, this);
+		//this._wpe = new WPE('192.168.11.101', 80, this);
 		this._wpe = new WPE('127.0.0.1', 80, this);
 		this._globalAnimation = this.animation({
 			duration: 7, repeat: 0, delay: 2, stopMethod: 'immediate', actions: [
@@ -43,12 +43,8 @@ export default class App extends ux.App{
 			this.startAnimation();
 		}, 2000);
 
-		//TESTING - add wifi list and set state for wifi:
-		//this._setState('WifiLocations'); show this state when no connection is available
-		// name: wifiName (string), strength: wifi strength (int 0 to 100), protected: is wifi password protected or not (boolean true or false)
-		//TODO: uncomment the 2 lines below to test:
-		// this.tag('WifiList').items = [{ name: 'Wifi01', strength: 80, protected: true }, { name: 'Wifi02', strength: 20, protected: true }, { name: 'Wifi03', strength: 45, protected: false }, { name: 'Wifi04', strength: 70, protected: false }, { name: 'Wifi05', strength: 10, protected: true }, { name: 'Wifi06', strength: 56, protected: true }, { name: 'Wifi07', strength: 100, protected: true }, { name: 'Wifi08', strength: 74, protected: false }, { name: 'Wifi09', strength: 24, protected: true }, { name: 'Wifi10', strength: 10, protected: true }, { name: 'Wifi11', strength: 88, protected: false }, { name: 'Wifi12', strength: 63, protected: true }];
-		// this._setState('WifiLocations');
+		// initialize when the animation is complete
+		setTimeout(this._wpe.init.bind(this._wpe), 7000);
 	}
 
 	startAnimation(){
@@ -77,13 +73,8 @@ export default class App extends ux.App{
 
 	$onLogin({ name = '', password = ''}){
 		console.log('$onLogin :', name, password);
-		//Setup connection
-		//then..
-		// foo.connectMyWifi(name, password).then(()=>{
-		// 	state: connected - Go to desired state or page
-		// }).catch(()=>{
-		// 	state: connection failed - this._setState('WifiLocations');
-		// });
+
+		this._wpe.connectWifi(name, password)
 	}
 
 	static _states(){
@@ -111,7 +102,8 @@ export default class App extends ux.App{
 				}
 			},
 			class WifiLocations extends this{
-				$enter(){
+				$enter(state, { data }){
+					this.tag('WifiList').items = data;
 					this.tag('WifiList').visible = true;
 					this._setState('WifiLocations.LoadLocations');
 				}
