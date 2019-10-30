@@ -1,15 +1,16 @@
 import ThunderJS from './ThunderJS.js';
+import Wifi from './Wifi.js';
 
-
+const CONNECTION_TIMEOUT = 15000
 
 export default class WPE {
-
-
     constructor(host, port, stage) {
         const config = {
             host: host,
             port: port
         };
+
+        this._wifi = new Wifi(config);
 
         this._stage = stage;
         this._baseBootmanagerUrl = 'http://bootmanager.metrological.com/rdk/landingpage';
@@ -24,7 +25,17 @@ export default class WPE {
         this._thunderjs.on('Controller', 'statechange', this._onMessage.bind(this));
     }
 
+    connectWifi(ssid, passwd) {
+        this._updateUIState('ConnectingToNetwork', ssid)
+        this._wifi.connect(ssid, passwd).then( () => {
+            setTimeout(this._noConnectionAfterTime.bind(this), CONNECTION_TIMEOUT);
+            this._checkForIP();
+        })
+
+    }
+
     init() {
+        console.log('init')
         this._uxPlugin = undefined;
         this._wifiPlugin = undefined;
         this._state = this.STATES.NOIP;
@@ -47,126 +58,30 @@ export default class WPE {
         });
 
         this._checkForIP();
-        setTimeout(this._noConnectionAfterTime.bind(this), 10000);
+        setTimeout(this._noConnectionAfterTime.bind(this), CONNECTION_TIMEOUT);
     }
 
     _noConnectionAfterTime() {
-        if (this._wifiConnectionListener)
-            this._thunderjs.dispose(this._wifiConnectionListener)
-
-        if (this._NetworkControlListener)
-            this._thunderjs.dispose(this._NetworkControlListener)
-
-        if (this._wifiControlScanListener)
-            this._thunderjs.dispose(this._wifiControlScanListener)
-
+        console.log('_noConnectionAfterTime')
         if (this._state !== this.STATES.HASINTERNET) {
-            if (this._wifiPlugin === undefined)
+            if (this._wifiPlugin === undefined) {
                 this._updateUIState('NoConnection');
-            else
-                this._getWifiNetworks();
-        }
-    }
-
-    _getWifiNetworks() {
-        console.log('No connection, getting Wifi networks');
-
-        let _getWifiNetworks = () => {
-            this._thunderjs.call('WifiControl', 'networks')
-                .then( data => {
-                    if (data === undefined)
-                        return;
-
-                    this._networks = data;
-                    let networks = data.filter( n => {
-                        if (n.ssid && n.ssid !== '')
-                            return true
-                        else
-                            return false
-                    }).map( n => {
-                        // the version I have has something weird with the signal strength, lets work around it, looks like an long int rollover of 4294967295
-                        if (n.signal > 4294967000)
-                            n.signal = 4294967295 - n.signal;
-
-                        // signal is measured in -dBm, which ranges from -30 dBm is 100% to -90dBm is 0%. However the value returned is positive
-                        let signal = 0;
-                        if (n.signal < 40)
-                            signal = 100;
-                        else if (n.signal < 50 && n.signal > 40)
-                            signal = 90;
-                        else if (n.signal < 60 && n.signal > 50)
-                            signal = 75;
-                        else if (n.signal < 70 && n.signal > 60)
-                            signal = 50;
-                        else if (n.signal > 80 && n.signal < 70)
-                            signal = 25;
-                        else
-                            signal = 0;
-
-                        return { name : n.ssid, strength : signal, protected : n.pairs[0].method === 'ESS' ? false : true }
-                    })
-
-                    console.log(`Got ${networks.length} networks`);
+            } else {
+                this._updateUIState('ScanningForNetworks');
+                this._wifi.networks().then( networks => {
                     this._updateUIState('WifiLocations', networks);
                 });
+            }
         }
-
-        this._wifiControlScanListener = this._thunderjs.on('WifiControl', 'scanresults', (data) => {
-            _getWifiNetworks();
-        });
-
-        this._thunderjs.call('WifiControl', 'scan')
-        setTimeout(_getWifiNetworks.bind(this), 2000)
-    }
-
-    connectWifi(ssid, password) {
-        console.log(`Connecting to ${ssid}`);
-        let network = this._networks.filter(n => {
-            if (n.ssid === ssid)
-                return true
-        })[0]
-
-        let type;
-        if (network.pairs[0].method === 'WPA2' || network.pairs[0].method === 'WPA')
-            type = 'WPA';
-        else if (network.pairs[0].method === 'WEP')
-            type = 'Unknown';
-        else if (network.pairs[0].method === 'ESS')
-            type = 'Unsecure';
-        else
-            type = 'Unkown';
-
-        this._thunderjs.call('WifiControl', `config@${ssid}`, {
-            ssid : ssid,
-            accesspoint : false,
-            psk : password,
-            type : type
-        }).then( () => {
-            setTimeout(this._connect.bind(this), 2000, ssid);
-        });
-    }
-
-    _connect(ssid) {
-        this._wifiConnectionListener = this._thunderjs.on('WifiControl', 'connectionchange', () => {
-            console.log(`Succesfully connected to wifi, getting IP`);
-            this._thunderjs.call('NetworkControl', 'request', { device: 'wlan0' })
-        });
-
-        //sadly the networkcontrol scoped events dont work yet, so go bananas
-        this._NetworkControlListener = this._thunderjs.on('Controller', 'all', (e) => {
-            if (e.callsign === 'NetworkControl')
-                this._checkForIP();
-        });
-
-        this._thunderjs.call('WifiControl', 'connect', { ssid: ssid })
-        setTimeout(this._noConnectionAfterTime.bind(this), 10000);
     }
 
     _checkForIP() {
-       this._thunderjs.call('Controller','status@TimeSync')
+        console.log('_checkForIP')
+        this._thunderjs.call('Controller','status@TimeSync')
             .then((res) => {
                 if (res && Array.isArray(res) && res[0] && res[0].state === "activated"){
                     this._state = this.STATES.HASIP;
+                    console.log('_checkForIP HASIP')
                     this._initState();
                     this._checkForInternet();
                 }
@@ -177,10 +92,12 @@ export default class WPE {
     }
 
     _checkForInternet() {
+        console.log('_checkForInternet')
         this._thunderjs.call('LocationSync', 'location')
             .then( (res) => {
                 if (res.publicip !== undefined && res.publicip !== '') {
                     this._state = this.STATES.HASINTERNET;
+                    console.log('_checkForInternet HASINTERNET')
                     this._initState();
                 }
             })
@@ -192,20 +109,22 @@ export default class WPE {
     _onMessage(notification) {
         if (!notification) return;
 
-        if (notification.callsign === 'LocationSync' && notification.state === 'Activated') {
-            this._state = this.STATES.HASIP;
-            this._initState();
-        }
+        if (notification.callsign === 'LocationSync' && notification.state === 'Activated')
+            this._checkForIP();
 
         if (notification.callsign === 'TimeSync' && notification.state === 'Activated')
             setTimeout(this._checkForInternet.bind(this), 5000);
 
+        if (notification.callsign === 'NetworkControl')
+            this._checkForIP();
+
     }
 
     _initState() {
+        console.log('_initState state:', this._state)
         if (this._state === this.STATES.NOIP) return;
 
-        if (this._state === this.STATES.HASIP)
+        if (this._state >= this.STATES.HASIP)
             this._getIPAddress();
 
         if (this._state === this.STATES.HASINTERNET) {
@@ -223,6 +142,7 @@ export default class WPE {
     }
 
     _updateUIState(state, data){
+        console.log('_updateUIState', state, data)
         this._stage._setState(state, [{data:data}]);
     }
 
@@ -233,6 +153,7 @@ export default class WPE {
 
     _launchUx(url) {
         //using all for now, individual states on UX through thunderjs didnt seem to work
+        console.log('_launchUx', url)
         this._thunderjs.on('Controller', 'all', (data) => {
             if (data.callsign !== 'UX')
                 return;
@@ -246,7 +167,7 @@ export default class WPE {
                 this._thunderjs.call('UX', 'url',  url)
 
             if (_data.url === url && _data.loaded)
-                this._harakiri();
+                setTimeout(this._harakiri.bind(this), 5000)
 
         });
 
@@ -266,13 +187,12 @@ export default class WPE {
     }
 
     _harakiri() {
-        // give UX some time to load
-        setTimeout( () => {
-            this._thunderjs.call('Controller', 'deactivate', {'callsign': 'WebKitBrowser'} )
-        }, 4000)
+        console.log('_harakiri')
+        this._thunderjs.call('Controller', 'deactivate', {'callsign': 'WebKitBrowser'})
     }
 
     _getIPAddress() {
+        console.log('_getIPAddress')
         this._thunderjs.DeviceInfo.addresses()
             .then(this._parseNetworks.bind(this))
             .catch((err) => {
@@ -281,6 +201,7 @@ export default class WPE {
     }
 
     _parseNetworks(data) {
+        console.log('_parseNetworks', data)
         let ipList = data.filter(d => {
             if (d.name === 'lo' || d.ip === undefined || d.ip.length < 1)
                 return false

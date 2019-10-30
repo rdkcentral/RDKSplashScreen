@@ -43,8 +43,14 @@ export default class App extends ux.App{
 			this.startAnimation();
 		}, 2000);
 
-		// initialize when the animation is complete
-		setTimeout(this._wpe.init.bind(this._wpe), 7000);
+		setTimeout(()=>{
+			this._wpe.init()
+		}, 2500)
+
+		setTimeout(()=>{
+			if (this.tag('Message').message === undefined)
+				this.tag('Message').message = 'Please wait...'
+		}, 7000)
 	}
 
 	startAnimation(){
@@ -73,7 +79,6 @@ export default class App extends ux.App{
 
 	$onLogin({ name = '', password = ''}){
 		console.log('$onLogin :', name, password);
-
 		this._wpe.connectWifi(name, password)
 	}
 
@@ -82,6 +87,21 @@ export default class App extends ux.App{
 			class HasLocalNetwork extends this{
 				$enter(state, { data }){
 					this.tag('Message').message = `Connected; IP: ${data}`;
+				}
+			},
+			class HasLocalNetwork extends this{
+				$enter(state, { data }){
+					this.tag('Message').message = `Connected; IP: ${data}`;
+				}
+			},
+			class ConnectingToNetwork extends this{
+				$enter(state, { data }){
+					this.tag('Message').message = `Connecting to: ${data}`;
+				}
+			},
+			class ScanningForNetworks extends this{
+				$enter(state){
+					this.tag('Message').message = `Scanning for networks...`;
 				}
 			},
 			class GoToURL extends this{
@@ -116,8 +136,6 @@ export default class App extends ux.App{
 					return [
 						class LoadLocations extends this{
 							$enter(){
-								//Testing
-								//Load location then....
 								this._setState('WifiLocations.Ready');
 							}
 						},

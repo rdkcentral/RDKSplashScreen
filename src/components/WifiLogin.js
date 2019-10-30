@@ -82,6 +82,7 @@ export default class WifiLogin extends lng.Component{
 			class LoginButton extends this{
 				_handleEnter(){
 					this.fireAncestors('$onLogin', { name: this.wifiName, password: this.tag('LoginKeyboard').value });
+					this.fire('$exit')
 				}
 
 				_handleUp(){
