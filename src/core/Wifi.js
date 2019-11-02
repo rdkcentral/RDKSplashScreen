@@ -4,6 +4,30 @@ export default class Wifi {
 
     constructor(config) {
         this._thunderjs = new ThunderJS(config);
+
+        this._networks = undefined
+    }
+
+    configs() {
+        return this._thunderjs.call('WifiControl', 'configs')
+    }
+
+    deleteConfigs() {
+        return this._thunderjs.call('WifiControl', 'configs').then( (configs) => {
+            configs.forEach(config => {
+                this._thunderjs.call('WifiControl', 'delete', { ssid : config.ssid })
+            })
+        })
+    }
+
+    getNetwork(ssid) {
+        if (this._networks === undefined)
+            return undefined
+
+        return this._networks.filter(n => {
+            if (n.name === ssid)
+                return true
+        })[0]
     }
 
     networks() {
@@ -14,8 +38,7 @@ export default class Wifi {
                         if (data === undefined || data.length === undefined || data.length === 0)
                             return;
 
-                        this._networks = data;
-                        let networks = data.filter( n => {
+                        this._networks = data.filter( n => {
                             if (n.ssid && n.ssid !== '')
                                 return true
                             else
@@ -40,14 +63,25 @@ export default class Wifi {
                             else
                                 signal = 0;
 
-                            return { name : n.ssid, strength : signal, protected : n.pairs[0].method === 'ESS' ? false : true }
+
+                            let type;
+                            if (n.pairs[0].method === 'WPA2' || n.pairs[0].method === 'WPA')
+                                type = 'WPA';
+                            else if (n.pairs[0].method === 'WEP')
+                                type = 'Unknown';
+                            else if (n.pairs[0].method === 'ESS')
+                                type = 'Unsecure';
+                            else
+                                type = 'Unkown';
+
+                            return { name : n.ssid, strength : signal, protected : n.pairs[0].method === 'ESS' ? false : true, type: type }
                         });
 
                         if (this._wifiControlScanListener)
                             this._wifiControlScanListener.dispose()
 
-                        console.log(`Got ${networks.length} networks`);
-                        resolve(networks);
+                        console.log(`Got ${this._networks.length} networks`);
+                        resolve(this._networks);
                     });
             }
 
@@ -61,42 +95,39 @@ export default class Wifi {
         });
     }
 
-    connect(ssid, password) {
+    scanAndConnect(ssid, password, type) {
         return new Promise( (resolve, reject) => {
-            console.log(`Connecting to ${ssid}`);
-            let network = this._networks.filter(n => {
-                if (n.ssid === ssid)
-                    return true
-            })[0]
-
-            let type;
-            if (network.pairs[0].method === 'WPA2' || network.pairs[0].method === 'WPA')
-                type = 'WPA';
-            else if (network.pairs[0].method === 'WEP')
-                type = 'Unknown';
-            else if (network.pairs[0].method === 'ESS')
-                type = 'Unsecure';
-            else
-                type = 'Unkown';
-
-            if (this._wifiConnectionListener)
-                this._wifiControlScanListener.dispose(this._wifiConnectionListener)
-
-            return this._thunderjs.call('WifiControl', `config@${ssid}`, {
-                ssid : ssid,
-                accesspoint : false,
-                psk : password,
-                type : type
-            }).then( () => {
-                this._wifiConnectionListener = this._thunderjs.on('WifiControl', 'connectionchange', () => {
-                    console.log(`Succesfully connected to wifi, getting IP`);
-                    this._thunderjs.call('NetworkControl', 'request', { device: 'wlan0' })
-                });
-
-                this._thunderjs.call('WifiControl', 'connect', { ssid: ssid })
-            })
+            this.networks()
+            .then( (networks) => {
+                    if (this.getNetwork(ssid) === undefined )
+                        reject('Network does not exist')
+                })
+            .then( this.connect(ssid, password, type) )
+            .then( resolve() )
         })
     }
 
+    connect(ssid, password, type) {
+        console.log(`Connecting to ${ssid} with psk: ${password} and type ${type}`);
 
+        if (this._wifiConnectionListener)
+            this._wifiControlScanListener.dispose(this._wifiConnectionListener)
+
+        return this._thunderjs.call('WifiControl', `config@${ssid}`, {
+            ssid : ssid,
+            accesspoint : false,
+            psk : password,
+            type : type
+        }).then( () => {
+            this._wifiConnectionListener = this._thunderjs.on('WifiControl', 'connectionchange', () => {
+                console.log('Succesfully connected to wifi, storing configuration');
+                this._thunderjs.call('WifiControl', 'store')
+                console.log('Getting IP on wlan0')
+                // FIXME - we should be able to handle more then wlan0
+                this._thunderjs.call('NetworkControl', 'request', { device: 'wlan0' })
+            });
+
+            this._thunderjs.call('WifiControl', 'connect', { ssid: ssid })
+        })
+    }
 }

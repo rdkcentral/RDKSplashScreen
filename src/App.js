@@ -89,11 +89,6 @@ export default class App extends ux.App{
 					this.tag('Message').message = `Connected; IP: ${data}`;
 				}
 			},
-			class HasLocalNetwork extends this{
-				$enter(state, { data }){
-					this.tag('Message').message = `Connected; IP: ${data}`;
-				}
-			},
 			class ConnectingToNetwork extends this{
 				$enter(state, { data }){
 					this.tag('Message').message = `Connecting to: ${data}`;
@@ -101,7 +96,22 @@ export default class App extends ux.App{
 			},
 			class ScanningForNetworks extends this{
 				$enter(state){
-					this.tag('Message').message = `Scanning for networks...`;
+					this.tag('Message').message = 'Scanning for networks...';
+				}
+			},
+			class ThunderError extends this{
+				$enter(state){
+					this.tag('Message').message = 'Error connecting to Thunder';
+				}
+			},
+			class WifiConnectError extends this{
+				$enter(state){
+					this.tag('Message').message = 'Error connecting to WiFi';
+				}
+			},
+			class Ready extends this{
+				$enter(state){
+					this.tag('Message').message = "We're ready!";
 				}
 			},
 			class GoToURL extends this{
@@ -118,7 +128,6 @@ export default class App extends ux.App{
 			class NoConnection extends this{
 				$enter(){
 					this.tag('Message').message = 'No valid internet connection';
-					this._setState('WifiLocations');
 				}
 			},
 			class WifiLocations extends this{
