@@ -18,6 +18,7 @@ export default class App extends ux.App{
 				RDKLogo: { x: 820, y: 800, type: RDKLogo, mount: 0.5, scale: 0.18 }
 			},
 			Message: { x: 80, y: 60, type: Message },
+			IpAddress: { x: 1640, y: 60, type: Message },
 			WifiList: { x: 100, y: 100, type: WifiList, visible: false },
 			WifiLoginScreen: { x: 960, y: 540, mount: 0.5, type: WifiLogin },
 			Overlay: { w: 1920, h: 1080, rect: true, color: 0xFF000000 }
@@ -86,7 +87,8 @@ export default class App extends ux.App{
 		return [
 			class HasLocalNetwork extends this{
 				$enter(state, { data }){
-					this.tag('Message').message = `Connected; IP: ${data}`;
+					this.tag('Message').message = `Connected!`;
+					this.tag('IpAddress').message = `IP: ${data}`;
 				}
 			},
 			class ConnectingToNetwork extends this{
