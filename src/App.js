@@ -18,7 +18,8 @@ export default class App extends ux.App{
 				RDKLogo: { x: 820, y: 800, type: RDKLogo, mount: 0.5, scale: 0.18 }
 			},
 			Message: { x: 80, y: 60, type: Message },
-			IpAddress: { x: 1640, y: 60, type: Message },
+			MessageAdditional: { x: 80, y: 90, type: Message },
+			IpAddress: { x: 1600, y: 60, type: Message },
 			WifiList: { x: 100, y: 100, type: WifiList, visible: false },
 			WifiLoginScreen: { x: 960, y: 540, mount: 0.5, type: WifiLogin },
 			Overlay: { w: 1920, h: 1080, rect: true, color: 0xFF000000 }
@@ -99,21 +100,39 @@ export default class App extends ux.App{
 			class ScanningForNetworks extends this{
 				$enter(state){
 					this.tag('Message').message = 'Scanning for networks...';
+					this.tag('MessageAdditional').message = '';
 				}
 			},
 			class ThunderError extends this{
 				$enter(state){
 					this.tag('Message').message = 'Error connecting to Thunder';
+					this.tag('MessageAdditional').message = '';
 				}
 			},
 			class WifiConnectError extends this{
 				$enter(state){
 					this.tag('Message').message = 'Error connecting to WiFi';
+					this.tag('MessageAdditional').message = '';
 				}
 			},
 			class Ready extends this{
 				$enter(state){
 					this.tag('Message').message = "We're ready!";
+					this.tag('MessageAdditional').message = 'Press OK to cancel UX';
+				}
+			},
+			class LaunchingUX extends this {
+				$enter(state) {
+					this.tag('MessageAdditional').message = 'Launching UX...';
+				}
+			},
+			class UserCancelled extends this {
+				$enter(state) {
+					this.tag('MessageAdditional').message = 'Cancelled UX';
+
+					setTimeout(() => {
+						this.tag('MessageAdditional').message = ''
+					}, 3000)
 				}
 			},
 			class GoToURL extends this{
@@ -130,6 +149,7 @@ export default class App extends ux.App{
 			class NoConnection extends this{
 				$enter(){
 					this.tag('Message').message = 'No valid internet connection';
+					this.tag('MessageAdditional').message = '';
 				}
 			},
 			class WifiLocations extends this{
@@ -137,6 +157,7 @@ export default class App extends ux.App{
 					this.tag('WifiList').items = data;
 					this.tag('WifiList').visible = true;
 					this._setState('WifiLocations.LoadLocations');
+					this.tag('MessageAdditional').message = '';
 				}
 
 				$exit(){
