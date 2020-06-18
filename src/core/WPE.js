@@ -39,6 +39,12 @@ export default class WPE {
 
     init() {
         console.log('init')
+        this._checkPlugins()
+        this.check()
+        setTimeout(this._noConnectionAfterTime.bind(this), CONNECTION_TIMEOUT);
+    }
+
+    _checkPlugins() {
         /*
         this._uxPlugin = undefined;
         this._wifiPlugin = undefined;
@@ -59,9 +65,6 @@ export default class WPE {
                 }
             }
         });
-
-        this.check()
-        setTimeout(this._noConnectionAfterTime.bind(this), CONNECTION_TIMEOUT);
     }
 
     /*
@@ -268,6 +271,10 @@ export default class WPE {
         if (notification.callsign === 'NetworkControl')
             this.check();
 
+        if (notification.callsign === 'WifiControl') {
+            this._checkPlugins();
+            setTimeout(this.check.bind(this), 5000)
+        }
     }
 
     /*
