@@ -50,10 +50,20 @@ export default class WPE {
         this._thunderjs.call('DeviceInfo', 'systeminfo').then( systeminfo => {
             this._deviceId = systeminfo.deviceid;
         })
+
+        this._userCancelled = false;
+        this._wifiWizard = false;
+        document.addEventListener('keyup', this._keyHandler.bind(this))
     }
 
     init() {
         console.log('init')
+        this._checkPlugins()
+        this.check()
+        setTimeout(this._noConnectionAfterTime.bind(this), CONNECTION_TIMEOUT);
+    }
+
+    _checkPlugins() {
         /*
         this._uxPlugin = undefined;
         this._wifiPlugin = undefined;
@@ -74,9 +84,21 @@ export default class WPE {
                 }
             }
         });
+    }
 
-        this.check()
-        setTimeout(this._noConnectionAfterTime.bind(this), CONNECTION_TIMEOUT);
+    /*
+     * Key handler
+     */
+    _keyHandler(e) {
+        // cancelling is no longer available while the wifi screens are up
+        if (this._wifiWizard === true)
+            return
+
+        if (e.keyCode === 13) {
+            console.log('user cancelled')
+            this._userCancelled = true;
+            this._updateUIState('UserCancelled');
+        }
     }
 
     /*
@@ -84,11 +106,13 @@ export default class WPE {
      */
     _noConnectionAfterTime() {
         console.log('_noConnectionAfterTime')
-        if (this._state === this.STATES.NOIP) {
-            if (this._wifiPlugin === undefined)
+        if (this._state !== this.STATES.HASINTERNET) {
+            if (this._wifiPlugin === undefined) {
                 this._updateUIState('NoConnection');
-            else
-                this._checkAvailableWifiConfigs()
+            } else {
+                this._wifiWizard = true;
+                this._checkAvailableWifiConfigs();
+            }
         }
     }
 
@@ -169,18 +193,20 @@ export default class WPE {
                 console.log('check state:', this._state)
 
                 if (this._state >= this.STATES.HASTIME) {
-                    this._getBootmanagerUrl()
-                    .then( data => {
-                        this._updateUIState('Ready')
+                    this._updateUIState('Ready');
+                    this._wifiWizard = false
 
-                        if (data.url && this._uxPlugin === undefined)
-                            // we dont seem to have a ux plugin, redirect the current window instead
-                            this._updateUIState('GoToURL', data);
-                        else if (data.url)
+                    setTimeout( () => {
+                        this._getBootmanagerUrl()
+                        .then( data => {
+                            if (this._userCancelled === true)
+                                return
+
                             this._launchUx(data.url);
-                    }).catch(err => {
-                        console.error(err);
-                    })
+                        }).catch(err => {
+                            console.error(err);
+                        })
+                    }, 7 * 1000);
                 } else {
                     this._checkInProgress = false
                 }
@@ -264,6 +290,10 @@ export default class WPE {
         if (notification.callsign === 'NetworkControl')
             this.check();
 
+        if (notification.callsign === 'WifiControl') {
+            this._checkPlugins();
+            setTimeout(this.check.bind(this), 5000)
+        }
     }
 
     /*
@@ -295,7 +325,9 @@ export default class WPE {
 
     _launchUx(url) {
         //using all for now, individual states on UX through thunderjs didnt seem to work
+        this._updateUIState('LaunchingUX');
         console.log('_launchUx', url)
+
         this._thunderjs.on('Controller', 'all', (data) => {
             if (data.callsign !== 'UX')
                 return;
