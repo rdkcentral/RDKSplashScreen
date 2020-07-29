@@ -446,8 +446,12 @@ var appBundle = (function () {
 
 
 	                            let type;
-	                            if (n.pairs[0].method === 'WPA2' || n.pairs[0].method === 'WPA')
+	                            if (n.pairs[0].method === 'WPA')
 	                                type = 'WPA';
+	                            else if (n.pairs[0].method === 'WPA2')
+	                                type = 'RSN';
+	                            else if (n.pairs[0].method === 'WPA_WPA2')
+	                                type = 'WPA RSN';
 	                            else if (n.pairs[0].method === 'WEP')
 	                                type = 'Unknown';
 	                            else if (n.pairs[0].method === 'ESS')
