@@ -1137,7 +1137,7 @@ var appBundle = function () {
                 var signal = 0;
                 if (n.signal < 40) signal = 100;else if (n.signal < 50 && n.signal > 40) signal = 90;else if (n.signal < 60 && n.signal > 50) signal = 75;else if (n.signal < 70 && n.signal > 60) signal = 50;else if (n.signal > 80 && n.signal < 70) signal = 25;else signal = 0;
                 var type;
-                if (n.pairs[0].method === 'WPA2' || n.pairs[0].method === 'WPA') type = 'WPA';else if (n.pairs[0].method === 'WEP') type = 'Unknown';else if (n.pairs[0].method === 'ESS') type = 'Unsecure';else type = 'Unkown';
+                if (n.pairs[0].method === 'WPA') type = 'WPA';else if (n.pairs[0].method === 'WPA2') type = 'RSN';else if (n.pairs[0].method === 'WPA_WPA2') type = 'WPA RSN';else if (n.pairs[0].method === 'WEP') type = 'Unknown';else if (n.pairs[0].method === 'ESS') type = 'Unsecure';else type = 'Unkown';
                 return {
                   name: n.ssid,
                   strength: signal,
