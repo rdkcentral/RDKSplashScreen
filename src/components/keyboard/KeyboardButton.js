@@ -49,7 +49,7 @@ export default class KeyboardButton extends lng.Component{
 
 	_update(){
 		const key = this._key;
-		let content = this._key.source ? { w: 39, h: 26, y: 30, src: this._key.source ? App.getPath(this._key.source) : '' } : { text: { text: key.c || '', fontFace: 'RobotoRegular', textAlign: 'center', fontSize: 36 } };
+		let content = this._key.source ? { w: 39, h: 26, y: 30, src: this._key.source ? Utils.asset(this._key.source) : '' } : { text: { text: key.c || '', fontFace: 'RobotoRegular', textAlign: 'center', fontSize: 36 } };
 		this.patch({
 			UnderLine: { alpha: (this.action !== 'input') ? 1 : 0, w: this.w, y: (this.h - 3) },
 			Background: { w: this.w, h: this.h, rect: true, color: 0xFF0E2B3D },

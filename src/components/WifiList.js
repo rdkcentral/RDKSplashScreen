@@ -18,8 +18,9 @@
  */
 
 import WifiItem from './WifiItem.js';
+import {Lightning} from '@lightningjs/sdk';
 
-export default class WifiList extends lng.Component{
+export default class WifiList extends Lightning.Component{
 	static _template(){
 		return {
 			w: 800, h: 510, clipping: true,

@@ -19,8 +19,9 @@
 
 import KeyboardTemplate from './KeyboardTemplate.js';
 import KeyboardButton from './KeyboardButton.js';
+import {Lightning, Utils} from '@lightningjs/sdk';
 
-export default class Keyboard extends lng.Component{
+export default class Keyboard extends Lightning.Component{
 	static _template(){
 		return {};
 	}

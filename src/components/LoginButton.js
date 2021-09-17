@@ -17,7 +17,8 @@
  * limitations under the License.
  */
 
-export default class LoginButton extends lng.Component{
+import {Lightning, Utils} from '@lightningjs/sdk';
+export default class LoginButton extends Lightning.Component{
 	static _template(){
 		return {
 			w: 1025, h: 70, rect: true, color: 0xFF0E2B3D,

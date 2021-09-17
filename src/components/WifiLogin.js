@@ -20,8 +20,9 @@
 // import App from '../App.js';
 import Keyboard from './keyboard/Keyboard.js';
 import LoginButton from './LoginButton.js';
+import {Lightning, Utils} from '@lightningjs/sdk';
 
-export default class WifiLogin extends lng.Component{
+export default class WifiLogin extends Lightning.Component{
 	static _template(){
 		return {
 			w: 0, h: 0, mount: 0.5, alpha: 0.0001, rect: true, color: 0xFF193643, clipping: true,

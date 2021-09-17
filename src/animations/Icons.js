@@ -17,17 +17,19 @@
  * limitations under the License.
  */
 
+
+import {Lightning, Utils} from '@lightningjs/sdk';
 import App from '../../src/App.js';
 
-export default class Icons extends lng.Component{
+export default class Icons extends Lightning.Component{
 	static _template(){
 		return {
-			Icon01: { mount: 0.5, scale: 0, x: 0, y: 0, w: 167, h: 167, src: App.getPath('images/assets/icon_01.png') },
-			Icon02: { mount: 0.5, scale: 0, x: 115, y: -205, w: 167, h: 167, src: App.getPath('images/assets/icon_02.png') },
-			Icon03: { mount: 0.5, scale: 0, x: 315, y: -325, w: 167, h: 167, src: App.getPath('images/assets/icon_03.png') },
-			Icon04: { mount: 0.5, scale: 0, x: 575, y: -325, w: 167, h: 167, src: App.getPath('images/assets/icon_04.png') },
-			Icon05: { mount: 0.5, scale: 0, x: 800, y: -205, w: 167, h: 167, src: App.getPath('images/assets/icon_05.png') },
-			Icon06: { mount: 0.5, scale: 0, x: 910, y: 0, w: 170, h: 170, src: App.getPath('images/assets/icon_06.png') }
+			Icon01: { mount: 0.5, scale: 0, x: 0, y: 0, w: 167, h: 167, src: Utils.asset('images/assets/icon_01.png') },
+			Icon02: { mount: 0.5, scale: 0, x: 115, y: -205, w: 167, h: 167, src: Utils.asset('images/assets/icon_02.png') },
+			Icon03: { mount: 0.5, scale: 0, x: 315, y: -325, w: 167, h: 167, src: Utils.asset('images/assets/icon_03.png') },
+			Icon04: { mount: 0.5, scale: 0, x: 575, y: -325, w: 167, h: 167, src: Utils.asset('images/assets/icon_04.png') },
+			Icon05: { mount: 0.5, scale: 0, x: 800, y: -205, w: 167, h: 167, src: Utils.asset('images/assets/icon_05.png') },
+			Icon06: { mount: 0.5, scale: 0, x: 910, y: 0, w: 170, h: 170, src: Utils.asset('images/assets/icon_06.png') }
 		};
 	}
 

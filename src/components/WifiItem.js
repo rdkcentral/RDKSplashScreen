@@ -18,12 +18,13 @@
  */
 
 import App from '../App.js';
+import {Lightning, Utils} from '@lightningjs/sdk';
 
-export default class WifiItem extends lng.Component{
+export default class WifiItem extends Lightning.Component{
 	static _template(){
 		return {
 			x: 800, w: 800, h: 80, rect: true, color: 0xFF0E2B3D,
-			WifiStrenghtIcon: { w: 50, h: 50, x: 25, y: 15, src: App.getPath('images/icons/icon_wifi.png') },
+			WifiStrenghtIcon: { w: 50, h: 50, x: 25, y: 15, src: Utils.asset('images/icons/icon_wifi.png') },
 			WifiProtectedIcon: { w: 25, h: 25, x: 60, y: 45 },
 			Label: { x: 100, mountY: 0.4, y: 40, text: { text: 'Unknown', fontSize: 32, maxLines: 1, wordWrapWidth: 650 } }
 		};
@@ -32,8 +33,8 @@ export default class WifiItem extends lng.Component{
 	set item(v){
 		this._item = v;
 		this.patch({
-			WifiStrenghtIcon: { src: App.getPath(WifiItem.getIconWifiStrength(v.strength)) },
-			WifiProtectedIcon: { src: App.getPath(WifiItem.getIconWifiProtected(v.protected)) },
+			WifiStrenghtIcon: { src: Utils.asset(WifiItem.getIconWifiStrength(v.strength)) },
+			WifiProtectedIcon: { src: Utils.asset(WifiItem.getIconWifiProtected(v.protected)) },
 			Label: { text: { text: v.name || 'Unknown' } }
 		});
 	}
