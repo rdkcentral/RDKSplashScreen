@@ -40,3 +40,7 @@ jspm_packages
 
 #mac
 .DS_Store
+dist
+releases
+.tmp
+build

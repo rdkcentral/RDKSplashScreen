@@ -17,6 +17,8 @@
  * limitations under the License.
  */
 
+import {Lightning, Utils} from '@lightningjs/sdk';
+
 import RDKLogo from './animations/RDKLogo.js';
 import Icons from './animations/Icons.js';
 import Message from './components/Message.js';
@@ -24,15 +26,15 @@ import WifiList from './components/WifiList.js';
 import WPE from './core/WPE.js';
 import WifiLogin from './components/WifiLogin.js';
 
-export default class App extends ux.App{
+export default class App extends Lightning.Component{
 	static _template(){
 		return {
 			Background: { w: 1920, h: 1080, rect: true, colorTop: 0xFF183644, colorBottom: 0xFF3C646D },
 			Wrapper: {
 				x: 800, y: -1660, w: 1920, h: 1080, scale: 6.4,
-				Clouds: { x: 545, y: 165, w: 1064, h: 556, src: App.getPath('images/assets/clouds.png') },
-				Shade: { x: 990, y: 965, w: 876, h: 858, scale: 0.7, mountY: 1, mountX: 0.5, src: App.getPath('images/assets/shade.png') },
-				House: { x: 525, y: 445, w: 930, h: 555, src: App.getPath('images/assets/house.png') },
+				Clouds: { x: 545, y: 165, w: 1064, h: 556, src: Utils.asset('images/assets/clouds.png') },
+				Shade: { x: 990, y: 965, w: 876, h: 858, scale: 0.7, mountY: 1, mountX: 0.5, src: Utils.asset('images/assets/shade.png') },
+				House: { x: 525, y: 445, w: 930, h: 555, src: Utils.asset('images/assets/house.png') },
 				Icons: { x: 540, y: 510, type: Icons },
 				RDKLogo: { x: 820, y: 800, type: RDKLogo, mount: 0.5, scale: 0.18 }
 			},

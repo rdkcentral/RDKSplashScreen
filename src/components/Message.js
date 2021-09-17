@@ -16,8 +16,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-export default class Message extends lng.Component{
+import {Lightning, Utils} from '@lightningjs/sdk';
+export default class Message extends Lightning.Component{
 	static _template(){
 		return {
 			Message: { color: 0xFF3B646C, text: { text: '', fontSize: 26 } }

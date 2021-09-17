@@ -16,8 +16,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-export default class WiFi extends lng.Component{
+import {Lightning, Utils} from '@lightningjs/sdk';
+export default class WiFi extends Lightning.Component{
 	static _template(){
 		return {
 			Background: { w: 1920, h: 1080, rect: true, colorTop: 0xFF183644, colorBottom: 0xFF3C646D },

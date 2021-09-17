@@ -2,10 +2,7 @@
   "author": "Metrological, Bas van Meurs <b.van.meurs@metrological.com>",
   "name": "lightning-app",
   "dependencies": {
-    "wpe-lightning-sdk": "https://github.com/WebPlatformForEmbedded/Lightning-SDK.git#e56100b799746bd0e118b1f7419c57057391b974"
-  },
-  "scripts": {
-    "release-web": "node ./node_modules/wpe-lightning-sdk/scripts/release-web.js",
-    "release-mpkg": "node ./node_modules/wpe-lightning-sdk/scripts/release-mpkg.js"
+    "@lightningjs/sdk": "git+https://github.com/rdkcentral/Lightning-SDK.git#733603cf5c912e4a749597876e3ca338eec1360d",
+    "wpe-lightning-sdk": "https://github.com/WebPlatformForEmbedded/Lightning-SDK.git"
   }
 }

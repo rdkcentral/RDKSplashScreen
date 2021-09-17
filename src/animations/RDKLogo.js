@@ -17,15 +17,16 @@
  * limitations under the License.
  */
 
+import {Lightning, Utils} from '@lightningjs/sdk';
 import App from '../../src/App.js';
 
-export default class RDKLogo extends lng.Component{
+export default class RDKLogo extends Lightning.Component{
 	static _template(){
 		return {
 			w: 1897, h: 372,
-			LetterR: { alpha: 0.0001, x: 500, y: 0, w: 436, h: 372, src: App.getPath('images/logo/Letter_R.png') },
-			LetterD: { alpha: 0.0001, x: 1000, y: 0, w: 431, h: 372, src: App.getPath('images/logo/Letter_D.png') },
-			LetterK: { alpha: 0.0001, x: 1500, y: 0, w: 397, h: 372, src: App.getPath('images/logo/Letter_K.png') },
+			LetterR: { alpha: 0.0001, x: 500, y: 0, w: 436, h: 372, src: Utils.asset('images/logo/Letter_R.png') },
+			LetterD: { alpha: 0.0001, x: 1000, y: 0, w: 431, h: 372, src: Utils.asset('images/logo/Letter_D.png') },
+			LetterK: { alpha: 0.0001, x: 1500, y: 0, w: 397, h: 372, src: Utils.asset('images/logo/Letter_K.png') },
 			BarBlue: { alpha: 0.0001, x: 0, y: 0, w: 449, h: 71, rect: true, color: 0xFF14B0DD },
 			BarYellow: { alpha: 0.0001, x: 0, y: 100, w: 449, h: 71, rect: true, color: 0xFFF9B82D },
 			BarGreen: { alpha: 0.0001, x: 0, y: 200, w: 449, h: 71, rect: true, color: 0xFF9AC235 },
