@@ -2,7 +2,6 @@
   "author": "Metrological, Bas van Meurs <b.van.meurs@metrological.com>",
   "name": "lightning-app",
   "dependencies": {
-    "@lightningjs/sdk": "git+https://github.com/rdkcentral/Lightning-SDK.git#733603cf5c912e4a749597876e3ca338eec1360d",
-    "wpe-lightning-sdk": "https://github.com/WebPlatformForEmbedded/Lightning-SDK.git"
+    "@lightningjs/sdk": "git+https://github.com/rdkcentral/Lightning-SDK.git#733603cf5c912e4a749597876e3ca338eec1360d"
   }
 }
